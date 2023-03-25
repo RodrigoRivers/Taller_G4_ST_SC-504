@@ -1,0 +1,502 @@
+---Tabla CLIENTES
+--- 1. Nuevo cliente a la tabla "Clientes"
+CREATE OR REPLACE PROCEDURE agregar_cliente(
+    p_id IN NUMBER,
+    p_nombre IN VARCHAR2,
+    p_direccion IN VARCHAR2,
+    p_telefono IN NUMBER
+)
+AS
+BEGIN
+    INSERT INTO Clientes(cliente_id, cliente_nombre, cliente_direccion, cliente_telefono)
+    VALUES (p_id, p_nombre, p_direccion, p_telefono);
+    
+    COMMIT;
+    
+    DBMS_OUTPUT.PUT_LINE('El cliente ha sido agregado correctamente.');
+
+END;
+--- 2. Actualizar info cliente existente
+CREATE OR REPLACE PROCEDURE actualizar_cliente(
+    p_id IN NUMBER,
+    p_nombre IN VARCHAR2,
+    p_direccion IN VARCHAR2,
+    p_telefono IN NUMBER
+)
+AS
+BEGIN
+    UPDATE Clientes
+    SET cliente_nombre = p_nombre,
+        cliente_direccion = p_direccion,
+        cliente_telefono = p_telefono
+    WHERE cliente_id = p_id;
+    
+    COMMIT;
+    
+    DBMS_OUTPUT.PUT_LINE('El cliente ha sido actualizado correctamente.');
+
+END;
+--- 3. Eliminar un cliente
+CREATE OR REPLACE PROCEDURE eliminar_cliente(
+    p_id IN NUMBER
+)
+AS
+BEGIN
+    DELETE FROM Clientes
+    WHERE cliente_id = p_id;
+    
+    COMMIT;
+    
+    DBMS_OUTPUT.PUT_LINE('El cliente ha sido eliminado correctamente.');
+
+END;
+
+
+
+
+
+
+
+---Tabla REPUESTOS
+---1.  Buscar repuesto por marca
+CREATE OR REPLACE PROCEDURE buscar_repuestos_por_marca(
+    p_marca IN VARCHAR2
+)
+AS
+    CURSOR c_repuestos IS
+        SELECT *
+        FROM Repuestos
+        WHERE repuesto_marca = p_marca;
+    v_repuesto Repuestos%ROWTYPE;
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Lista de repuestos de marca ' || p_marca || ':');
+    OPEN c_repuestos;
+    LOOP
+        FETCH c_repuestos INTO v_repuesto;
+        EXIT WHEN c_repuestos%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE(v_repuesto.repuesto_id || ' - ' || v_repuesto.repuesto_descripcion);
+    END LOOP;
+    CLOSE c_repuestos;
+END;
+--- 2. Actualiza el precio de los repuestos
+CREATE OR REPLACE PROCEDURE actualizar_precios_repuestos(
+    p_incremento IN NUMBER
+)
+AS
+BEGIN
+    UPDATE Repuestos
+    SET repuesto_precio = repuesto_precio + p_incremento;
+    
+    COMMIT;
+    
+    DBMS_OUTPUT.PUT_LINE('Los precios de los repuestos han sido actualizados correctamente.');
+
+END;
+--- 3. Da cantidad total de repuestos
+CREATE OR REPLACE PROCEDURE cantidad_total_repuestos
+AS
+    v_cantidad NUMBER;
+BEGIN
+    SELECT COUNT(*)
+    INTO v_cantidad
+    FROM Repuestos;
+    
+    DBMS_OUTPUT.PUT_LINE('La cantidad total de repuestos es: ' || v_cantidad);
+END;
+
+
+
+
+
+
+
+
+
+--- Tabla MAQUINAS
+--- 1. Buscar maquina por id
+CREATE OR REPLACE PROCEDURE buscar_maquina_por_id(
+    p_maquina_id IN NUMBER
+)
+AS
+    v_maquina Maquinas%ROWTYPE;
+BEGIN
+    SELECT *
+    INTO v_maquina
+    FROM Maquinas
+    WHERE maquina_id = p_maquina_id;
+    
+    DBMS_OUTPUT.PUT_LINE('La máquina con ID ' || p_maquina_id || ' es: ' || v_maquina.maquina_descripcion || ' y hay ' || v_maquina.maquina_cantidad || ' unidades disponibles.');
+
+END;
+---2.Obtiene la descripciones de las maquinas
+CREATE OR REPLACE PROCEDURE obtener_descripcion_maquinas
+AS
+    CURSOR c_maquinas IS SELECT maquina_descripcion FROM Maquinas;
+    v_descripcion VARCHAR2(30);
+BEGIN
+    OPEN c_maquinas;
+    LOOP
+        FETCH c_maquinas INTO v_descripcion;
+        EXIT WHEN c_maquinas%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('Descripción: ' || v_descripcion);
+    END LOOP;
+    CLOSE c_maquinas;
+END;
+---3.Obtiene la cantidad de maquinas total
+CREATE OR REPLACE PROCEDURE obtener_cantidad_total_maquinas AS
+    v_cantidad_total NUMBER;
+BEGIN
+    SELECT SUM(maquina_cantidad)
+    INTO v_cantidad_total
+    FROM Maquinas;
+    
+    DBMS_OUTPUT.PUT_LINE('La cantidad total de máquinas registradas es: ' || v_cantidad_total);
+END;
+
+
+
+
+
+
+
+
+---Tabla HERRAMIENTAS
+---1. Buscar herramienta por ID
+CREATE OR REPLACE PROCEDURE buscar_herramienta(
+    p_id IN Herramientas.herramienta_id%TYPE,
+    p_herramienta OUT Herramientas.herramienta_descripcion%TYPE,
+    p_cantidad OUT Herramientas.herramienta_cantidad%TYPE
+)
+IS
+BEGIN
+    SELECT herramienta_descripcion, herramienta_cantidad
+    INTO p_herramienta, p_cantidad
+    FROM Herramientas
+    WHERE herramienta_id = p_id;
+    
+    DBMS_OUTPUT.PUT_LINE('Herramienta encontrada: ' || p_herramienta || ', cantidad: ' || p_cantidad);
+END;
+
+---2. Incrementa la cantidad de herramientas
+CREATE OR REPLACE PROCEDURE incrementar_cantidad_herramienta(
+    p_id IN Herramientas.herramienta_id%TYPE,
+    p_cantidad IN Herramientas.herramienta_cantidad%TYPE
+)
+IS
+BEGIN
+    UPDATE Herramientas
+    SET herramienta_cantidad = herramienta_cantidad + p_cantidad
+    WHERE herramienta_id = p_id;
+    
+    DBMS_OUTPUT.PUT_LINE(p_cantidad || ' herramientas han sido agregadas al inventario.');
+END;
+---3. Muestra la cantidad total de herramientas
+CREATE OR REPLACE PROCEDURE mostrar_cantidad_total_herramientas
+IS
+    v_total NUMBER;
+BEGIN
+    SELECT SUM(herramienta_cantidad)
+    INTO v_total
+    FROM Herramientas;
+    
+    DBMS_OUTPUT.PUT_LINE('La cantidad total de herramientas en el inventario es: ' || v_total);
+
+END;
+
+
+
+
+
+
+
+
+---Tabla INSTRUMENTOS
+---1. Buscar el instrumentos con mayor cantidad de inventario
+CREATE OR REPLACE PROCEDURE buscar_instrumento_mas_cantidad
+IS
+    v_instrumento Instrumentos.instrumento_descripcion%TYPE;
+    v_cantidad_max Instrumentos.instrumento_cantidad%TYPE;
+BEGIN
+    SELECT instrumento_descripcion, instrumento_cantidad
+    INTO v_instrumento, v_cantidad_max
+    FROM Instrumentos
+    WHERE instrumento_cantidad = (SELECT MAX(instrumento_cantidad) FROM Instrumentos);
+    
+    DBMS_OUTPUT.PUT_LINE('El instrumento con mayor cantidad en el inventario es: ' || v_instrumento || ', con una cantidad de ' || v_cantidad_max || ' unidades.');
+END;
+
+---2. Crea un promedio de las cantidades de instrumentos
+CREATE OR REPLACE PROCEDURE calcular_cantidad_promedio_instrumentos
+IS
+    v_cantidad_promedio NUMBER;
+BEGIN
+    SELECT AVG(instrumento_cantidad)
+    INTO v_cantidad_promedio
+    FROM Instrumentos;
+    
+    DBMS_OUTPUT.PUT_LINE('La cantidad promedio de instrumentos en el inventario es: ' || v_cantidad_promedio);
+END;
+
+---3. Muestra los instrumentos por ID y la cantidad de todos los instrumentos
+CREATE OR REPLACE PROCEDURE mostrar_id_cantidad_instrumentos
+IS
+BEGIN
+    FOR r IN (SELECT instrumento_id, instrumento_cantidad FROM Instrumentos ORDER BY instrumento_id)
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('ID: ' || r.instrumento_id || ', cantidad: ' || r.instrumento_cantidad);
+    END LOOP;
+END;
+
+
+
+
+
+
+
+
+
+
+---Tabla FACTURAS
+---1. Total de facturas por cliente
+CREATE OR REPLACE PROCEDURE obtener_total_facturas_cliente (
+    p_cliente_id IN NUMBER,
+    p_total OUT NUMBER
+)
+AS
+BEGIN
+    SELECT COUNT(*) INTO p_total
+    FROM Facturas
+    WHERE cliente_id = p_cliente_id;
+END;
+
+---2. Cantidad total de facturas y monto total
+CREATE OR REPLACE PROCEDURE mostrar_cantidad_total_facturas
+IS
+    v_cantidad NUMBER;
+    v_monto_total NUMBER;
+BEGIN
+    SELECT COUNT(*), SUM(factura_monto)
+    INTO v_cantidad, v_monto_total
+    FROM Facturas;
+    
+    DBMS_OUTPUT.PUT_LINE('La cantidad total de facturas es: ' || v_cantidad || ', y el monto total de las facturas es: ' || v_monto_total);
+END;
+
+---3. Muestra facturas de un mes especifico
+CREATE OR REPLACE PROCEDURE mostrar_facturas_por_mes(
+    p_mes IN VARCHAR2
+)
+IS
+BEGIN
+    FOR factura IN (SELECT factura_id, cliente_id, repuesto_id, factura_monto, factura_fecha FROM Facturas WHERE factura_fecha LIKE '%' || p_mes || '%')
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('Factura ID: ' || factura.factura_id || ', cliente ID: ' || factura.cliente_id || ', repuesto ID: ' || factura.repuesto_id || ', monto: ' || factura.factura_monto || ', fecha: ' || factura.factura_fecha);
+    END LOOP;
+END;
+
+
+
+
+
+
+
+
+---Tabla MECANICOS
+---1. Buscar mecánico por ID
+CREATE OR REPLACE PROCEDURE buscar_mecanico(
+    p_id IN Mecanicos.mecanico_id%TYPE,
+    p_nombre OUT Mecanicos.mecanico_nombre%TYPE,
+    p_direccion OUT Mecanicos.mecanico_direccion%TYPE,
+    p_telefono OUT Mecanicos.mecanico_telefono%TYPE
+)
+IS
+BEGIN
+    SELECT mecanico_nombre, mecanico_direccion, mecanico_telefono
+    INTO p_nombre, p_direccion, p_telefono
+    FROM Mecanicos
+    WHERE mecanico_id = p_id;
+    
+    DBMS_OUTPUT.PUT_LINE('Mecánico encontrado: ' || p_nombre || ', dirección: ' || p_direccion || ', teléfono: ' || p_telefono);
+END;
+
+
+---2. Enlista mecánicos alfabeticamente
+CREATE OR REPLACE PROCEDURE listar_mecanicos_alfabetico
+IS
+BEGIN
+    FOR mec IN (SELECT * FROM Mecanicos ORDER BY mecanico_nombre)
+    LOOP
+        DBMS_OUTPUT.PUT_LINE(mec.mecanico_id || ' - ' || mec.mecanico_nombre || ', ' || mec.mecanico_direccion || ', ' || mec.mecanico_telefono);
+    END LOOP;
+END;
+
+
+---3. Muestra total de mecánicos en tabla
+CREATE OR REPLACE PROCEDURE mostrar_cantidad_total_mecanicos
+IS
+    v_total NUMBER;
+BEGIN
+    SELECT COUNT(*)
+    INTO v_total
+    FROM Mecanicos;
+    
+    DBMS_OUTPUT.PUT_LINE('El número total de mecánicos en la tabla es: ' || v_total);
+END;
+
+
+
+
+
+
+
+
+
+---Tabla VEHICULOS
+---1. Muestra vehículo de un cliente en especifico
+CREATE OR REPLACE PROCEDURE mostrar_vehiculos_cliente(
+    p_cliente_id IN Clientes.cliente_id%TYPE
+)
+IS
+BEGIN
+    FOR vehiculo IN (
+        SELECT vehiculo_marca, vehiculo_modelo, vehiculo_placa
+        FROM Vehiculos
+        WHERE cliente_id = p_cliente_id
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE(vehiculo.vehiculo_marca || ' ' || vehiculo.vehiculo_modelo || ', placa ' || vehiculo.vehiculo_placa);
+    END LOOP;
+END;
+
+---2. Muestra los vehículos atendidos por un mecánico en especifico
+CREATE OR REPLACE PROCEDURE mostrar_vehiculos_mecanico(
+    p_mecanico_id IN Mecanicos.mecanico_id%TYPE
+)
+IS
+BEGIN
+    FOR vehiculo IN (
+        SELECT vehiculo_marca, vehiculo_modelo, vehiculo_placa
+        FROM Vehiculos
+        WHERE mecanico_id = p_mecanico_id
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE(vehiculo.vehiculo_marca || ' ' || vehiculo.vehiculo_modelo || ', placa ' || vehiculo.vehiculo_placa);
+    END LOOP;
+END;
+
+
+---3. Muestra la cantidad de vehículos por marca
+CREATE OR REPLACE PROCEDURE mostrar_cantidad_vehiculos_marca
+IS
+BEGIN
+    FOR vehiculo IN (
+        SELECT vehiculo_marca, COUNT(*) AS cantidad
+        FROM Vehiculos
+        GROUP BY vehiculo_marca
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE(vehiculo.vehiculo_marca || ': ' || vehiculo.cantidad || ' vehículos');
+    END LOOP;
+END;
+
+
+
+
+
+
+
+
+
+---Tabla SUCURSALES
+---1.Busca sucursal por ID y muestra info
+CREATE OR REPLACE PROCEDURE buscar_sucursal_por_id(
+    p_id IN Sucursales.sucursal_id%TYPE
+)
+IS
+    v_sucursal Sucursales%ROWTYPE;
+BEGIN
+    SELECT * INTO v_sucursal FROM Sucursales WHERE sucursal_id = p_id;
+    
+    DBMS_OUTPUT.PUT_LINE('Información de la sucursal con ID ' || p_id || ':');
+    DBMS_OUTPUT.PUT_LINE('Dirección: ' || v_sucursal.sucursal_direccion);
+    DBMS_OUTPUT.PUT_LINE('Teléfono: ' || v_sucursal.sucursal_telefono);
+END;
+
+
+---2. Muestras las sucursales en orden alfabético
+CREATE OR REPLACE PROCEDURE listar_sucursales_ordenadas_por_direccion
+IS
+BEGIN
+    FOR sucursal IN (SELECT * FROM Sucursales ORDER BY sucursal_direccion)
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('ID: ' || sucursal.sucursal_id || ', dirección: ' || sucursal.sucursal_direccion || ', teléfono: ' || sucursal.sucursal_telefono);
+    END LOOP;
+END;
+
+
+---3. Cantidad de sucursales que tengas una especifica subcadena en la dirección
+CREATE OR REPLACE PROCEDURE cantidad_sucursales_por_subcadena_direccion(
+    p_subcadena IN VARCHAR2
+)
+IS
+    v_cantidad NUMBER(10);
+BEGIN
+    SELECT COUNT(*) INTO v_cantidad FROM Sucursales WHERE UPPER(sucursal_direccion) LIKE '%' || UPPER(p_subcadena) || '%';
+    
+    DBMS_OUTPUT.PUT_LINE('Cantidad de sucursales con dirección que contiene "' || p_subcadena || '": ' || v_cantidad);
+END;
+
+
+
+
+
+
+
+
+--- Tabla CITAS
+---1. Mostrar todas las citas asignada a un mecánico en especifico
+CREATE OR REPLACE PROCEDURE mostrar_citas_mecanico(
+    p_mecanico_id IN Citas.mecanico_id%TYPE
+)
+IS
+BEGIN
+    FOR cita IN (SELECT cita_descripcion, cita_fecha, cita_hora
+                 FROM Citas
+                 WHERE mecanico_id = p_mecanico_id)
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('Descripción: ' || cita.cita_descripcion || ', fecha: ' || cita.cita_fecha || ', hora: ' || cita.cita_hora);
+    END LOOP;
+END;
+
+---2. Obtener detalle de cita por ID
+CREATE OR REPLACE PROCEDURE obtener_detalle_cita (cita_id IN NUMBER)
+IS
+    cliente_nombre Citas.cliente_nombre%TYPE;
+    mecanico_nombre Citas.mecanico_nombre%TYPE;
+    sucursal_nombre Citas.sucursal_nombre%TYPE;
+    cita_descripcion Citas.cita_descripcion%TYPE;
+    cita_fecha Citas.cita_fecha%TYPE;
+    cita_hora Citas.cita_hora%TYPE;
+BEGIN
+    SELECT c.cliente_nombre, m.mecanico_nombre, s.sucursal_nombre, c.cita_descripcion, c.cita_fecha, c.cita_hora
+    INTO cliente_nombre, mecanico_nombre, sucursal_nombre, cita_descripcion, cita_fecha, cita_hora
+    FROM Citas c
+    INNER JOIN Clientes cl ON c.cliente_id = cl.cliente_id
+    INNER JOIN Mecanicos m ON c.mecanico_id = m.mecanico_id
+    INNER JOIN Sucursales s ON c.sucursal_id = s.sucursal_id
+    WHERE c.cita_id = cita_id;
+    
+    DBMS_OUTPUT.PUT_LINE('Detalles de la cita con id ' || cita_id || ':');
+    DBMS_OUTPUT.PUT_LINE('Cliente: ' || cliente_nombre);
+    DBMS_OUTPUT.PUT_LINE('Mecánico: ' || mecanico_nombre);
+    DBMS_OUTPUT.PUT_LINE('Sucursal: ' || sucursal_nombre);
+    DBMS_OUTPUT.PUT_LINE('Descripción: ' || cita_descripcion);
+    DBMS_OUTPUT.PUT_LINE('Fecha: ' || cita_fecha);
+    DBMS_OUTPUT.PUT_LINE('Hora: ' || cita_hora);
+END;
+
+---3. Obtener cantidad de citas por cliente
+CREATE OR REPLACE PROCEDURE obtener_citas_por_cliente (cliente_id IN NUMBER)
+IS
+    cantidad_citas NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO cantidad_citas FROM Citas WHERE cliente_id = cliente_id;
+    DBMS_OUTPUT.PUT_LINE('El cliente con id ' || cliente_id || ' tiene ' || cantidad_citas || ' citas.');
+END;
