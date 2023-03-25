@@ -1,0 +1,842 @@
+-- Creacion de tablas:
+
+CREATE TABLE Clientes
+(
+    cliente_id NUMBER(15),
+    cliente_nombre VARCHAR(20),
+    cliente_direccion VARCHAR(40),
+    cliente_telefono NUMBER(8),
+    CONSTRAINT cliente_pk PRIMARY KEY (cliente_id)
+);
+
+CREATE TABLE Repuestos
+(
+    repuesto_id NUMBER(15),
+    repuesto_descripcion VARCHAR(30),
+    repuesto_marca VARCHAR(25),
+    repuesto_cantidad NUMBER(30),
+    repuesto_precio NUMBER(20),
+    CONSTRAINT repuesto_pk PRIMARY KEY (repuesto_id)
+);
+
+CREATE TABLE Maquinas
+(
+    maquina_id NUMBER(15),
+    maquina_descripcion VARCHAR(30),
+    maquina_cantidad NUMBER(20),
+    CONSTRAINT maquina_pk PRIMARY KEY (maquina_id)
+);
+
+CREATE TABLE Herramientas
+(
+    herramienta_id NUMBER(15),
+    herramienta_descripcion VARCHAR(30),
+    herramienta_cantidad NUMBER(20),
+    CONSTRAINT herramienta_pk PRIMARY KEY (herramienta_id)
+);
+
+CREATE TABLE Instrumentos
+(
+    instrumento_id NUMBER(15),
+    instrumento_descripcion VARCHAR(30),
+    instrumento_cantidad NUMBER(20),
+    CONSTRAINT instrumento_pk PRIMARY KEY (instrumento_id)
+);
+
+CREATE TABLE Facturas
+(
+    factura_id NUMBER(15),
+    cliente_id NUMBER(15),
+    repuesto_id NUMBER(15),
+    factura_monto NUMBER(20),
+    factura_fecha VARCHAR(10),
+    CONSTRAINT factura_pk PRIMARY KEY (factura_id),
+    CONSTRAINT fk_factura_cliente FOREIGN KEY (cliente_id) REFERENCES Clientes(cliente_id),
+    CONSTRAINT fk_factura_respuesto FOREIGN KEY (repuesto_id) REFERENCES Repuestos(repuesto_id)
+);
+
+CREATE TABLE Mecanicos
+(
+    mecanico_id NUMBER(15),
+    mecanico_nombre VARCHAR(20),
+    mecanico_direccion VARCHAR(30),
+    mecanico_telefono NUMBER(8),
+    CONSTRAINT mecanico_pk PRIMARY KEY (mecanico_id)
+);
+
+CREATE TABLE Vehiculos
+(
+    vehiculo_id NUMBER(15),
+    cliente_id NUMBER(15),
+    mecanico_id NUMBER(15),
+    vehiculo_marca VARCHAR(25),
+    vehiculo_modelo VARCHAR(25),
+    vehiculo_placa VARCHAR(7),
+    CONSTRAINT vehiculo_pk PRIMARY KEY (vehiculo_id),
+    CONSTRAINT fk_vehiculo_cliente FOREIGN KEY (cliente_id) REFERENCES Clientes(cliente_id),
+    CONSTRAINT fk_vehiculo_mecanico FOREIGN KEY (mecanico_id) REFERENCES Mecanicos(mecanico_id)
+);
+
+CREATE TABLE Sucursales
+(
+    sucursal_id NUMBER(15),
+    sucursal_direccion VARCHAR(30),
+    sucursal_telefono NUMBER(8),
+    CONSTRAINT sucursal_pk PRIMARY KEY (sucursal_id)
+);
+
+CREATE TABLE Citas
+(
+    cita_id NUMBER(15),
+    cliente_id NUMBER(15),
+    mecanico_id NUMBER(15),
+    sucursal_id NUMBER(15),
+    cita_descripcion VARCHAR(30),
+    cita_fecha VARCHAR(10),
+    cita_hora VARCHAR(5),
+    CONSTRAINT cita_pk PRIMARY KEY (cita_id),
+    CONSTRAINT fk_cita_cliente FOREIGN KEY (cliente_id) REFERENCES Clientes(cliente_id),
+    CONSTRAINT fk_cita_mecanico FOREIGN KEY (mecanico_id) REFERENCES Mecanicos(mecanico_id),
+    CONSTRAINT fk_cita_sucursal FOREIGN KEY (sucursal_id) REFERENCES Sucursales(sucursal_id)
+);
+
+--- Inserciones:
+
+INSERT INTO Clientes (cliente_id, cliente_nombre, cliente_direccion, cliente_telefono)
+VALUES (1, 'Juan Perez', 'Calle 1, Ciudad', 12345678);
+
+INSERT INTO Repuestos (repuesto_id, repuesto_descripcion, repuesto_marca, repuesto_cantidad, repuesto_precio)
+VALUES (1, 'Bateria', 'ACME', 10, 100.00);
+
+INSERT INTO Maquinas (maquina_id, maquina_descripcion, maquina_cantidad)
+VALUES (1, 'Torno', 5);
+
+INSERT INTO Herramientas (herramienta_id, herramienta_descripcion, herramienta_cantidad)
+VALUES (1, 'Martillo', 20);
+
+INSERT INTO Instrumentos (instrumento_id, instrumento_descripcion, instrumento_cantidad)
+VALUES (1, 'Multimetro', 10);
+
+INSERT INTO Facturas (factura_id, cliente_id, repuesto_id, factura_monto, factura_fecha)
+VALUES (1, 1, 1, 1000.00, '2023-03-24');
+
+INSERT INTO Mecanicos (mecanico_id, mecanico_nombre, mecanico_direccion, mecanico_telefono)
+VALUES (1, 'Pedro Ramirez', 'Calle 2, Ciudad', 87654321);
+
+INSERT INTO Vehiculos (vehiculo_id, cliente_id, mecanico_id, vehiculo_marca, vehiculo_modelo, vehiculo_placa)
+VALUES (1, 1, 1, 'Toyota', 'Corolla', 'ABC123');
+
+INSERT INTO Sucursales (sucursal_id, sucursal_direccion, sucursal_telefono)
+VALUES (1, 'Calle 3, Ciudad', 24681012);
+
+INSERT INTO Citas (cita_id, cliente_id, mecanico_id, sucursal_id, cita_descripcion, cita_fecha, cita_hora)
+VALUES (1, 1, 1, 1, 'Cambio de aceite', '2023-03-25', '10:00');
+
+--- Funciones:
+
+CREATE OR REPLACE FUNCTION CLIENTE_BUSCADOR_F(F_CODIGO IN NUMBER) 
+    RETURN VARCHAR2
+    IS 
+    F_NOMBRE VARCHAR2(20);
+BEGIN 
+    SELECT cliente_nombre INTO F_NOMBRE
+    FROM Clientes
+    WHERE cliente_id = F_CODIGO;
+
+    RETURN ('El codigo ' || F_CODIGO || ' pertenece al cliente ' || F_NOMBRE || '.');  
+END;
+
+DECLARE 
+	MENSAJE VARCHAR2(100); 
+BEGIN 
+	MENSAJE := CLIENTE_BUSCADOR_F(1); 
+	DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION REPUESTO_BUSCADOR_F(F_CODIGO IN NUMBER) 
+    RETURN VARCHAR2
+    IS 
+    F_DESCRIPCION VARCHAR2(30);
+BEGIN 
+    SELECT repuesto_descripcion INTO F_DESCRIPCION
+    FROM Repuestos
+    WHERE repuesto_id = F_CODIGO;
+
+    RETURN ('El codigo ' || F_CODIGO || ' pertenece al repuesto ' || F_DESCRIPCION || '.');  
+END;
+
+DECLARE 
+	MENSAJE VARCHAR2(100); 
+BEGIN 
+	MENSAJE := REPUESTO_BUSCADOR_F(1); 
+	DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION MAQUINA_BUSCADOR_F(F_CODIGO IN NUMBER) 
+    RETURN VARCHAR2
+    IS 
+    F_DESCRIPCION VARCHAR2(30);
+BEGIN 
+    SELECT maquina_descripcion INTO F_DESCRIPCION
+    FROM Maquinas
+    WHERE maquina_id = F_CODIGO;
+
+    RETURN ('El codigo ' || F_CODIGO || ' pertenece a la maquina ' || F_DESCRIPCION || '.');  
+END;
+
+DECLARE 
+	MENSAJE VARCHAR2(100); 
+BEGIN 
+	MENSAJE := MAQUINA_BUSCADOR_F(1); 
+	DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION HERRAMIENTA_BUSCADOR_F(F_CODIGO IN NUMBER) 
+    RETURN VARCHAR2
+    IS 
+    F_DESCRIPCION VARCHAR2(30);
+BEGIN 
+    SELECT herramienta_descripcion INTO F_DESCRIPCION
+    FROM Herramientas
+    WHERE herramienta_id = F_CODIGO;
+
+    RETURN ('El codigo ' || F_CODIGO || ' pertenece a la herramienta ' || F_DESCRIPCION || '.');  
+END;
+
+DECLARE 
+	MENSAJE VARCHAR2(100); 
+BEGIN 
+	MENSAJE := HERRAMIENTA_BUSCADOR_F(1); 
+	DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION INSTRUMENTO_BUSCADOR_F(F_CODIGO IN NUMBER) 
+    RETURN VARCHAR2
+    IS 
+    F_DESCRIPCION VARCHAR2(30);
+BEGIN 
+    SELECT instrumento_descripcion INTO F_DESCRIPCION
+    FROM Instrumentos
+    WHERE instrumento_id = F_CODIGO;
+
+    RETURN ('El codigo ' || F_CODIGO || ' pertenece al instrumento ' || F_DESCRIPCION || '.');  
+END;
+
+DECLARE 
+	MENSAJE VARCHAR2(100); 
+BEGIN 
+	MENSAJE := INSTRUMENTO_BUSCADOR_F(1); 
+	DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION VEHICULO_BUSCADOR_F(F_CODIGO IN NUMBER) 
+    RETURN VARCHAR2
+    IS 
+    F_PLACA VARCHAR2(7);
+BEGIN 
+    SELECT vehiculo_placa INTO F_PLACA
+    FROM Vehiculos
+    WHERE vehiculo_id = F_CODIGO;
+
+    RETURN ('El codigo ' || F_CODIGO || ' pertenece al vehiculo con placa ' || F_PLACA || '.');  
+END;
+
+DECLARE 
+    MENSAJE VARCHAR2(100); 
+BEGIN 
+    MENSAJE := VEHICULO_BUSCADOR_F(1); 
+    DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION SUCURSAL_BUSCADOR_F(F_CODIGO IN NUMBER) 
+    RETURN VARCHAR2
+    IS 
+    F_DIRECCION VARCHAR2(30);
+BEGIN 
+    SELECT sucursal_direccion INTO F_DIRECCION
+    FROM Sucursales
+    WHERE sucursal_id = F_CODIGO;
+
+    RETURN ('El codigo ' || F_CODIGO || ' pertenece a la sucursal ubicada en ' || F_DIRECCION || '.');  
+END;
+
+DECLARE 
+    MENSAJE VARCHAR2(100); 
+BEGIN 
+    MENSAJE := SUCURSAL_BUSCADOR_F(1); 
+    DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION CITA_BUSCADOR_F(F_CODIGO IN NUMBER) 
+    RETURN VARCHAR2
+    IS 
+    F_DESCRIPCION VARCHAR2(30);
+BEGIN 
+    SELECT cita_descripcion INTO F_DESCRIPCION
+    FROM Citas
+    WHERE cita_id = F_CODIGO;
+
+    RETURN ('El codigo ' || F_CODIGO || ' corresponde a la cita con la descripcion: ' || F_DESCRIPCION || '.');  
+END;
+
+DECLARE 
+    MENSAJE VARCHAR2(100); 
+BEGIN 
+    MENSAJE := CITA_BUSCADOR_F(1); 
+    DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION CLIENTE_TOTAL_F
+    RETURN VARCHAR2
+    IS 
+    F_TOTAL NUMBER(20);
+BEGIN 
+    SELECT COUNT(*) INTO F_TOTAL
+    FROM Clientes;
+
+    RETURN ('Existe un total de ' || F_TOTAL || ' cliente/s.');  
+END;
+
+DECLARE 
+    MENSAJE VARCHAR2(100); 
+BEGIN 
+    MENSAJE := CLIENTE_TOTAL_F(); 
+    DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION REPUESTO_TOTAL_F
+    RETURN VARCHAR2
+    IS 
+    F_TOTAL NUMBER(20);
+BEGIN 
+    SELECT COUNT(*) INTO F_TOTAL
+    FROM Repuestos;
+
+    RETURN ('Existe un total de ' || F_TOTAL || ' repuesto/s.');  
+END;
+
+DECLARE 
+    MENSAJE VARCHAR2(100); 
+BEGIN 
+    MENSAJE := REPUESTO_TOTAL_F(); 
+    DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION MAQUINA_TOTAL_F
+    RETURN VARCHAR2
+    IS 
+    F_TOTAL NUMBER(20);
+BEGIN 
+    SELECT COUNT(*) INTO F_TOTAL
+    FROM Maquinas;
+
+    RETURN ('Existe un total de ' || F_TOTAL || ' máquina/s.');  
+END;
+
+DECLARE 
+    MENSAJE VARCHAR2(100); 
+BEGIN 
+    MENSAJE := MAQUINA_TOTAL_F(); 
+    DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION HERRAMIENTA_TOTAL_F
+    RETURN VARCHAR2
+    IS 
+    F_TOTAL NUMBER(20);
+BEGIN 
+    SELECT COUNT(*) INTO F_TOTAL
+    FROM Herramientas;
+
+    RETURN ('Existe un total de ' || F_TOTAL || ' herramienta/s.');  
+END;
+
+DECLARE 
+    MENSAJE VARCHAR2(100); 
+BEGIN 
+    MENSAJE := HERRAMIENTA_TOTAL_F(); 
+    DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION INSTRUMENTO_TOTAL_F
+    RETURN VARCHAR2
+    IS 
+    F_TOTAL NUMBER(20);
+BEGIN 
+    SELECT COUNT(*) INTO F_TOTAL
+    FROM Instrumentos;
+
+    RETURN ('Existe un total de ' || F_TOTAL || ' instrumento/s.');  
+END;
+
+DECLARE 
+    MENSAJE VARCHAR2(100); 
+BEGIN 
+    MENSAJE := INSTRUMENTO_TOTAL_F(); 
+    DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION FACTURA_TOTAL_F
+    RETURN VARCHAR2
+    IS 
+    F_TOTAL NUMBER(20);
+BEGIN 
+    SELECT COUNT(*) INTO F_TOTAL
+    FROM Facturas;
+
+    RETURN ('Existe un total de ' || F_TOTAL || ' factura/s.');  
+END;
+
+DECLARE 
+    MENSAJE VARCHAR2(100); 
+BEGIN 
+    MENSAJE := FACTURA_TOTAL_F(); 
+    DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION MECANICO_TOTAL_F
+    RETURN VARCHAR2
+    IS 
+    F_TOTAL NUMBER(20);
+BEGIN 
+    SELECT COUNT(*) INTO F_TOTAL
+    FROM Mecanicos;
+
+    RETURN ('Existe un total de ' || F_TOTAL || ' mecánico/s.');  
+END;
+
+DECLARE 
+    MENSAJE VARCHAR2(100); 
+BEGIN 
+    MENSAJE := MECANICO_TOTAL_F(); 
+    DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION VEHICULO_TOTAL_F
+    RETURN VARCHAR2
+IS 
+    F_TOTAL NUMBER(20);
+BEGIN 
+    SELECT COUNT(*) INTO F_TOTAL
+    FROM Vehiculos;
+
+    RETURN ('Existe un total de ' || F_TOTAL || ' vehículo/s.');  
+END;
+
+DECLARE 
+    MENSAJE VARCHAR2(100); 
+BEGIN 
+    MENSAJE := VEHICULO_TOTAL_F(); 
+    DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION SUCURSAL_TOTAL_F
+    RETURN VARCHAR2
+IS 
+    F_TOTAL NUMBER(20);
+BEGIN 
+    SELECT COUNT(*) INTO F_TOTAL
+    FROM Sucursales;
+
+    RETURN ('Existe un total de ' || F_TOTAL || ' sucursal/es.');  
+END;
+
+DECLARE 
+    MENSAJE VARCHAR2(100); 
+BEGIN 
+    MENSAJE := SUCURSAL_TOTAL_F(); 
+    DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE FUNCTION CITA_TOTAL_F
+    RETURN VARCHAR2
+IS 
+    F_TOTAL NUMBER(20);
+BEGIN 
+    SELECT COUNT(*) INTO F_TOTAL
+    FROM Citas;
+
+    RETURN ('Existe un total de ' || F_TOTAL || ' cita/s.');  
+END;
+
+DECLARE 
+    MENSAJE VARCHAR2(100); 
+BEGIN 
+    MENSAJE := CITA_TOTAL_F(); 
+    DBMS_OUTPUT.PUT_LINE(MENSAJE);  
+END;
+
+CREATE OR REPLACE PROCEDURE agregar_cliente(
+    p_id IN NUMBER,
+    p_nombre IN VARCHAR2,
+    p_direccion IN VARCHAR2,
+    p_telefono IN NUMBER
+)
+AS
+BEGIN
+    INSERT INTO Clientes(cliente_id, cliente_nombre, cliente_direccion, cliente_telefono)
+    VALUES (p_id, p_nombre, p_direccion, p_telefono);
+    
+    COMMIT;
+    
+    DBMS_OUTPUT.PUT_LINE('El cliente ha sido agregado correctamente.');
+
+END;
+--- 2. Actualizar info cliente existente
+CREATE OR REPLACE PROCEDURE actualizar_cliente(
+    p_id IN NUMBER,
+    p_nombre IN VARCHAR2,
+    p_direccion IN VARCHAR2,
+    p_telefono IN NUMBER
+)
+AS
+BEGIN
+    UPDATE Clientes
+    SET cliente_nombre = p_nombre,
+        cliente_direccion = p_direccion,
+        cliente_telefono = p_telefono
+    WHERE cliente_id = p_id;
+    
+    COMMIT;
+    
+    DBMS_OUTPUT.PUT_LINE('El cliente ha sido actualizado correctamente.');
+
+END;
+--- 3. Eliminar un cliente
+CREATE OR REPLACE PROCEDURE eliminar_cliente(
+    p_id IN NUMBER
+)
+AS
+BEGIN
+    DELETE FROM Clientes
+    WHERE cliente_id = p_id;
+    
+    COMMIT;
+    
+    DBMS_OUTPUT.PUT_LINE('El cliente ha sido eliminado correctamente.');
+
+END;
+
+-- Procedimientos almacenados:
+
+CREATE OR REPLACE PROCEDURE buscar_repuestos_por_marca(
+    p_marca IN VARCHAR2
+)
+AS
+    CURSOR c_repuestos IS
+        SELECT *
+        FROM Repuestos
+        WHERE repuesto_marca = p_marca;
+    v_repuesto Repuestos%ROWTYPE;
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Lista de repuestos de marca ' || p_marca || ':');
+    OPEN c_repuestos;
+    LOOP
+        FETCH c_repuestos INTO v_repuesto;
+        EXIT WHEN c_repuestos%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE(v_repuesto.repuesto_id || ' - ' || v_repuesto.repuesto_descripcion);
+    END LOOP;
+    CLOSE c_repuestos;
+END;
+
+CREATE OR REPLACE PROCEDURE actualizar_precios_repuestos(
+    p_incremento IN NUMBER
+)
+AS
+BEGIN
+    UPDATE Repuestos
+    SET repuesto_precio = repuesto_precio + p_incremento;
+    
+    COMMIT;
+    
+    DBMS_OUTPUT.PUT_LINE('Los precios de los repuestos han sido actualizados correctamente.');
+
+END;
+
+CREATE OR REPLACE PROCEDURE cantidad_total_repuestos
+AS
+    v_cantidad NUMBER;
+BEGIN
+    SELECT COUNT(*)
+    INTO v_cantidad
+    FROM Repuestos;
+    
+    DBMS_OUTPUT.PUT_LINE('La cantidad total de repuestos es: ' || v_cantidad);
+END;
+
+CREATE OR REPLACE PROCEDURE buscar_maquina_por_id(
+    p_maquina_id IN NUMBER
+)
+AS
+    v_maquina Maquinas%ROWTYPE;
+BEGIN
+    SELECT *
+    INTO v_maquina
+    FROM Maquinas
+    WHERE maquina_id = p_maquina_id;
+    
+    DBMS_OUTPUT.PUT_LINE('La máquina con ID ' || p_maquina_id || ' es: ' || v_maquina.maquina_descripcion || ' y hay ' || v_maquina.maquina_cantidad || ' unidades disponibles.');
+
+END;
+
+CREATE OR REPLACE PROCEDURE obtener_descripcion_maquinas
+AS
+    CURSOR c_maquinas IS SELECT maquina_descripcion FROM Maquinas;
+    v_descripcion VARCHAR2(30);
+BEGIN
+    OPEN c_maquinas;
+    LOOP
+        FETCH c_maquinas INTO v_descripcion;
+        EXIT WHEN c_maquinas%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('Descripción: ' || v_descripcion);
+    END LOOP;
+    CLOSE c_maquinas;
+END;
+
+CREATE OR REPLACE PROCEDURE obtener_cantidad_total_maquinas AS
+    v_cantidad_total NUMBER;
+BEGIN
+    SELECT SUM(maquina_cantidad)
+    INTO v_cantidad_total
+    FROM Maquinas;
+    
+    DBMS_OUTPUT.PUT_LINE('La cantidad total de máquinas registradas es: ' || v_cantidad_total);
+END;
+
+CREATE OR REPLACE PROCEDURE buscar_herramienta(
+    p_id IN Herramientas.herramienta_id%TYPE,
+    p_herramienta OUT Herramientas.herramienta_descripcion%TYPE,
+    p_cantidad OUT Herramientas.herramienta_cantidad%TYPE
+)
+IS
+BEGIN
+    SELECT herramienta_descripcion, herramienta_cantidad
+    INTO p_herramienta, p_cantidad
+    FROM Herramientas
+    WHERE herramienta_id = p_id;
+    
+    DBMS_OUTPUT.PUT_LINE('Herramienta encontrada: ' || p_herramienta || ', cantidad: ' || p_cantidad);
+END;
+
+CREATE OR REPLACE PROCEDURE incrementar_cantidad_herramienta(
+    p_id IN Herramientas.herramienta_id%TYPE,
+    p_cantidad IN Herramientas.herramienta_cantidad%TYPE
+)
+IS
+BEGIN
+    UPDATE Herramientas
+    SET herramienta_cantidad = herramienta_cantidad + p_cantidad
+    WHERE herramienta_id = p_id;
+    
+    DBMS_OUTPUT.PUT_LINE(p_cantidad || ' herramientas han sido agregadas al inventario.');
+END;
+
+CREATE OR REPLACE PROCEDURE mostrar_cantidad_total_herramientas
+IS
+    v_total NUMBER;
+BEGIN
+    SELECT SUM(herramienta_cantidad)
+    INTO v_total
+    FROM Herramientas;
+    
+    DBMS_OUTPUT.PUT_LINE('La cantidad total de herramientas en el inventario es: ' || v_total);
+
+END;
+
+CREATE OR REPLACE PROCEDURE buscar_instrumento_mas_cantidad
+IS
+    v_instrumento Instrumentos.instrumento_descripcion%TYPE;
+    v_cantidad_max Instrumentos.instrumento_cantidad%TYPE;
+BEGIN
+    SELECT instrumento_descripcion, instrumento_cantidad
+    INTO v_instrumento, v_cantidad_max
+    FROM Instrumentos
+    WHERE instrumento_cantidad = (SELECT MAX(instrumento_cantidad) FROM Instrumentos);
+    
+    DBMS_OUTPUT.PUT_LINE('El instrumento con mayor cantidad en el inventario es: ' || v_instrumento || ', con una cantidad de ' || v_cantidad_max || ' unidades.');
+END;
+
+CREATE OR REPLACE PROCEDURE calcular_cantidad_promedio_instrumentos
+IS
+    v_cantidad_promedio NUMBER;
+BEGIN
+    SELECT AVG(instrumento_cantidad)
+    INTO v_cantidad_promedio
+    FROM Instrumentos;
+    
+    DBMS_OUTPUT.PUT_LINE('La cantidad promedio de instrumentos en el inventario es: ' || v_cantidad_promedio);
+END;
+
+CREATE OR REPLACE PROCEDURE mostrar_id_cantidad_instrumentos
+IS
+BEGIN
+    FOR r IN (SELECT instrumento_id, instrumento_cantidad FROM Instrumentos ORDER BY instrumento_id)
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('ID: ' || r.instrumento_id || ', cantidad: ' || r.instrumento_cantidad);
+    END LOOP;
+END;
+
+CREATE OR REPLACE PROCEDURE obtener_total_facturas_cliente (
+    p_cliente_id IN NUMBER,
+    p_total OUT NUMBER
+)
+AS
+BEGIN
+    SELECT COUNT(*) INTO p_total
+    FROM Facturas
+    WHERE cliente_id = p_cliente_id;
+END;
+
+CREATE OR REPLACE PROCEDURE mostrar_cantidad_total_facturas
+IS
+    v_cantidad NUMBER;
+    v_monto_total NUMBER;
+BEGIN
+    SELECT COUNT(*), SUM(factura_monto)
+    INTO v_cantidad, v_monto_total
+    FROM Facturas;
+    
+    DBMS_OUTPUT.PUT_LINE('La cantidad total de facturas es: ' || v_cantidad || ', y el monto total de las facturas es: ' || v_monto_total);
+END;
+
+CREATE OR REPLACE PROCEDURE mostrar_facturas_por_mes(
+    p_mes IN VARCHAR2
+)
+IS
+BEGIN
+    FOR factura IN (SELECT factura_id, cliente_id, repuesto_id, factura_monto, factura_fecha FROM Facturas WHERE factura_fecha LIKE '%' || p_mes || '%')
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('Factura ID: ' || factura.factura_id || ', cliente ID: ' || factura.cliente_id || ', repuesto ID: ' || factura.repuesto_id || ', monto: ' || factura.factura_monto || ', fecha: ' || factura.factura_fecha);
+    END LOOP;
+END;
+
+CREATE OR REPLACE PROCEDURE buscar_mecanico(
+    p_id IN Mecanicos.mecanico_id%TYPE,
+    p_nombre OUT Mecanicos.mecanico_nombre%TYPE,
+    p_direccion OUT Mecanicos.mecanico_direccion%TYPE,
+    p_telefono OUT Mecanicos.mecanico_telefono%TYPE
+)
+IS
+BEGIN
+    SELECT mecanico_nombre, mecanico_direccion, mecanico_telefono
+    INTO p_nombre, p_direccion, p_telefono
+    FROM Mecanicos
+    WHERE mecanico_id = p_id;
+    
+    DBMS_OUTPUT.PUT_LINE('Mecánico encontrado: ' || p_nombre || ', dirección: ' || p_direccion || ', teléfono: ' || p_telefono);
+END;
+
+CREATE OR REPLACE PROCEDURE listar_mecanicos_alfabetico
+IS
+BEGIN
+    FOR mec IN (SELECT * FROM Mecanicos ORDER BY mecanico_nombre)
+    LOOP
+        DBMS_OUTPUT.PUT_LINE(mec.mecanico_id || ' - ' || mec.mecanico_nombre || ', ' || mec.mecanico_direccion || ', ' || mec.mecanico_telefono);
+    END LOOP;
+END;
+
+CREATE OR REPLACE PROCEDURE mostrar_cantidad_total_mecanicos
+IS
+    v_total NUMBER;
+BEGIN
+    SELECT COUNT(*)
+    INTO v_total
+    FROM Mecanicos;
+    
+    DBMS_OUTPUT.PUT_LINE('El número total de mecánicos en la tabla es: ' || v_total);
+END;
+
+CREATE OR REPLACE PROCEDURE mostrar_vehiculos_cliente(
+    p_cliente_id IN Clientes.cliente_id%TYPE
+)
+IS
+BEGIN
+    FOR vehiculo IN (
+        SELECT vehiculo_marca, vehiculo_modelo, vehiculo_placa
+        FROM Vehiculos
+        WHERE cliente_id = p_cliente_id
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE(vehiculo.vehiculo_marca || ' ' || vehiculo.vehiculo_modelo || ', placa ' || vehiculo.vehiculo_placa);
+    END LOOP;
+END;
+
+CREATE OR REPLACE PROCEDURE mostrar_vehiculos_mecanico(
+    p_mecanico_id IN Mecanicos.mecanico_id%TYPE
+)
+IS
+BEGIN
+    FOR vehiculo IN (
+        SELECT vehiculo_marca, vehiculo_modelo, vehiculo_placa
+        FROM Vehiculos
+        WHERE mecanico_id = p_mecanico_id
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE(vehiculo.vehiculo_marca || ' ' || vehiculo.vehiculo_modelo || ', placa ' || vehiculo.vehiculo_placa);
+    END LOOP;
+END;
+
+CREATE OR REPLACE PROCEDURE mostrar_cantidad_vehiculos_marca
+IS
+BEGIN
+    FOR vehiculo IN (
+        SELECT vehiculo_marca, COUNT(*) AS cantidad
+        FROM Vehiculos
+        GROUP BY vehiculo_marca
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE(vehiculo.vehiculo_marca || ': ' || vehiculo.cantidad || ' vehículos');
+    END LOOP;
+END;
+
+CREATE OR REPLACE PROCEDURE buscar_sucursal_por_id(
+    p_id IN Sucursales.sucursal_id%TYPE
+)
+IS
+    v_sucursal Sucursales%ROWTYPE;
+BEGIN
+    SELECT * INTO v_sucursal FROM Sucursales WHERE sucursal_id = p_id;
+    
+    DBMS_OUTPUT.PUT_LINE('Información de la sucursal con ID ' || p_id || ':');
+    DBMS_OUTPUT.PUT_LINE('Dirección: ' || v_sucursal.sucursal_direccion);
+    DBMS_OUTPUT.PUT_LINE('Teléfono: ' || v_sucursal.sucursal_telefono);
+END;
+
+CREATE OR REPLACE PROCEDURE listar_sucursales_ordenadas_por_direccion
+IS
+BEGIN
+    FOR sucursal IN (SELECT * FROM Sucursales ORDER BY sucursal_direccion)
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('ID: ' || sucursal.sucursal_id || ', dirección: ' || sucursal.sucursal_direccion || ', teléfono: ' || sucursal.sucursal_telefono);
+    END LOOP;
+END;
+
+CREATE OR REPLACE PROCEDURE cantidad_sucursales_por_subcadena_direccion(
+    p_subcadena IN VARCHAR2
+)
+IS
+    v_cantidad NUMBER(10);
+BEGIN
+    SELECT COUNT(*) INTO v_cantidad FROM Sucursales WHERE UPPER(sucursal_direccion) LIKE '%' || UPPER(p_subcadena) || '%';
+    
+    DBMS_OUTPUT.PUT_LINE('Cantidad de sucursales con dirección que contiene "' || p_subcadena || '": ' || v_cantidad);
+END;
+
+CREATE OR REPLACE PROCEDURE mostrar_citas_mecanico(
+    p_mecanico_id IN Citas.mecanico_id%TYPE
+)
+IS
+BEGIN
+    FOR cita IN (SELECT cita_descripcion, cita_fecha, cita_hora
+                 FROM Citas
+                 WHERE mecanico_id = p_mecanico_id)
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('Descripción: ' || cita.cita_descripcion || ', fecha: ' || cita.cita_fecha || ', hora: ' || cita.cita_hora);
+    END LOOP;
+END;
+
+
+CREATE OR REPLACE PROCEDURE obtener_citas_por_cliente (cliente_id IN NUMBER)
+IS
+    cantidad_citas NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO cantidad_citas FROM Citas WHERE cliente_id = cliente_id;
+    DBMS_OUTPUT.PUT_LINE('El cliente con id ' || cliente_id || ' tiene ' || cantidad_citas || ' citas.');
+END;
