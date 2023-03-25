@@ -1,0 +1,63 @@
+-----1--------------
+CREATE VIEW sucursales_heredia AS
+SELECT *
+FROM Sucursales
+WHERE sucursal_direccion LIKE '%Heredia%';
+
+
+-------2-------------
+CREATE VIEW vista_vehiculos_toyota AS
+SELECT *
+FROM Vehiculos
+WHERE vehiculo_marca LIKE '%Toyota%';
+
+-----------3---------------
+CREATE VIEW MecanicosAE AS
+SELECT *
+FROM Mecanicos
+WHERE mecanico_nombre LIKE '%a%' OR mecanico_nombre LIKE '%e%';
+
+
+--------------4----------
+CREATE VIEW citas_con_reparacion AS
+SELECT *
+FROM Citas
+WHERE cita_descripcion LIKE '%reparacion%';
+
+--------5-------------------
+CREATE VIEW Herramientas_Mas_De_6 AS
+SELECT herramienta_id, herramienta_descripcion, herramienta_cantidad
+FROM Herramientas
+WHERE herramienta_cantidad > 6;
+
+------- 6 -----------------
+CREATE VIEW repuestos_originales AS
+SELECT *
+FROM Repuestos
+WHERE repuesto_marca LIKE '%toyota%' OR repuesto_marca LIKE '%honda%' OR repuesto_marca LIKE '%bmw%';
+
+------- 7------------------
+CREATE VIEW clientes_kolbi AS
+SELECT cliente_id, cliente_nombre, cliente_direccion, cliente_telefono
+FROM clientes
+WHERE cliente_telefono BETWEEN 80000000 AND 89999999 AND cliente_telefono LIKE '8%';
+
+
+-------8-----------------
+CREATE VIEW repuestos_premium AS
+SELECT *
+FROM Repuestos
+WHERE repuesto_precio > 40000;
+
+
+-------9------------------
+CREATE VIEW herramientas_mecanicas AS
+SELECT *
+FROM Herramientas
+WHERE herramienta_descripcion LIKE '%mecanica%';
+
+-------10---------------
+CREATE VIEW vehiculos_con_placa_0 AS
+SELECT *
+FROM Vehiculos
+WHERE vehiculo_placa LIKE '0%';
