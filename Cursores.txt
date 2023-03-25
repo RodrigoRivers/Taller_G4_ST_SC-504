@@ -1,0 +1,177 @@
+---Tabla CLIENTES
+--- 1)
+DECLARE
+  CURSOR cur_clientes IS
+  SELECT * from Clientes;
+BEGIN FOR V_FILA IN cur_clientes LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.cliente_id|| ' ' ||V_FILA.cliente_nombre);
+END LOOP;
+END;
+--- 2)
+DECLARE
+   CURSOR cur_clientes IS
+   SELECT * from Clientes;
+BEGIN FOR V_FILA IN cur_clientes LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.cliente_nombre|| ' ' ||V_FILA.cliente_direccion);
+END LOOP;
+END;
+---Tabla REPUESTOS
+--- 1)
+DECLARE
+   CURSOR cur_repuestos IS
+   SELECT * from Repuestos;
+BEGIN FOR V_FILA IN cur_repuestos LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.repuesto_id|| ' ' ||V_FILA.repuesto_descripcion);
+END LOOP;
+END;
+--- 2)
+DECLARE
+   CURSOR cur_repuestos IS
+   SELECT * from Repuestos;
+BEGIN FOR V_FILA IN cur_repuestos LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.repuesto_marca|| ' ' ||V_FILA.repuesto_cantidad);
+END LOOP;
+END;
+
+---Tabla MAQUINAS
+--- 1)
+DECLARE
+   CURSOR cur_maquinas IS
+   SELECT * from Maquinas;
+BEGIN FOR V_FILA IN cur_maquinas LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.maquina_id|| ' ' ||V_FILA.maquina_descripcion);
+END LOOP;
+END;
+--- 2)
+DECLARE
+   CURSOR cur_maquinas IS
+   SELECT * from Maquinas;
+BEGIN FOR V_FILA IN cur_maquinas LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.maquina_cantidad);
+END LOOP;
+END;
+
+---Tabla HERRAMIENTAS
+--- 1)
+DECLARE
+   CURSOR cur_herramientas IS
+   SELECT * from Herramientas;
+BEGIN FOR V_FILA IN cur_herramientas LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.herramienta_id|| ' ' ||V_FILA.herramienta_descripcion);
+END LOOP;
+END;
+--- 2)
+DECLARE
+   CURSOR cur_herramientas IS
+   SELECT * from Herramientas;
+BEGIN FOR V_FILA IN cur_herramientas LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.herramienta_cantidad);
+END LOOP;
+END;
+
+---Tabla INSTRUMENTOS
+--- 1)
+DECLARE
+   CURSOR cur_instrumentos IS
+   SELECT * from Instrumentos;
+BEGIN FOR V_FILA IN cur_instrumentos LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.instrumento_id|| ' ' ||V_FILA.instrumento_descripcion);
+END LOOP;
+END;
+--- 2)
+DECLARE
+   CURSOR cur_instrumentos IS
+   SELECT * from Instrumentos;
+BEGIN FOR V_FILA IN cur_instrumentos LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.instrumento_cantidad);
+END LOOP;
+END;
+
+---Tabla FACTURAS
+--- 1)
+DECLARE
+   CURSOR cur_facturas IS
+   SELECT * from Facturas;
+BEGIN FOR V_FILA IN cur_facturas LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.factura_id|| ' ' ||V_FILA.factura_monto);
+END LOOP;
+END;
+--- 2)
+DECLARE
+   CURSOR cur_facturas IS
+   SELECT * from Facturas;
+BEGIN FOR V_FILA IN cur_facturas LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.cliente_id || ' ' ||V_FILA.factura_fecha);
+END LOOP;
+END;
+
+---Tabla MECANICOS
+--- 1)
+DECLARE
+   CURSOR cur_mecanicos IS
+   SELECT * from Mecanicos;
+BEGIN FOR V_FILA IN cur_mecanicos LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.mecanico_id|| ' ' ||V_FILA.mecanico_nombre);
+END LOOP;
+END;
+--- 2)
+DECLARE
+   CURSOR cur_mecanicos IS
+   SELECT * from Mecanicos;
+BEGIN FOR V_FILA IN cur_mecanicos LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.mecanico_direccion|| ' ' ||V_FILA.mecanico_telefono);
+END LOOP;
+END;
+
+---Tabla VEHICULOS
+--- 1)
+DECLARE
+   CURSOR cur_vehiculos IS
+   SELECT * from Vehiculos;
+BEGIN FOR V_FILA IN cur_vehiculos LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.vehiculo_id|| ' ' ||V_FILA.vehiculo_marca);
+END LOOP;
+END;
+--- 2)
+DECLARE
+   CURSOR cur_vehiculos IS
+   SELECT * from Vehiculos;
+BEGIN FOR V_FILA IN cur_vehiculos LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.vehiculo_placa);
+END LOOP;
+END;
+
+---Tabla SUCURSALES
+--- 1)
+DECLARE
+   CURSOR cur_sucursales IS
+   SELECT * from Sucursales;
+BEGIN FOR V_FILA IN cur_sucursales LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.sucursal_id|| ' ' ||V_FILA.sucursal_direccion);
+END LOOP;
+END;
+--- 2)
+DECLARE
+   CURSOR cur_sucursales IS
+   SELECT * from Sucursales;
+BEGIN FOR V_FILA IN cur_sucursales LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.sucursal_telefono);
+END LOOP;
+END;
+---Tabla CITAS
+--- 1)
+DECLARE
+   CURSOR cur_citas IS
+   SELECT * from Citas;
+BEGIN FOR V_FILA IN cur_citas LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.cita_id|| ' ' ||V_FILA.cita_descripcion);
+END LOOP;
+END;
+--- 2)
+DECLARE
+   CURSOR cur_citas IS
+   SELECT * from Citas;
+BEGIN FOR V_FILA IN cur_citas LOOP
+DBMS_OUTPUT.PUT_LINE(V_FILA.cita_fecha|| ' ' ||V_FILA.cita_hora);
+END LOOP;
+END;
