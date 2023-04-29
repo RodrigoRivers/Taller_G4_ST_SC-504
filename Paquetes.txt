@@ -1,0 +1,148 @@
+-- Paquete cliente
+
+CREATE OR REPLACE PACKAGE ACCIONES_CLIENTE AS  
+    PROCEDURE agregar_cliente(
+    p_id IN NUMBER,
+    p_nombre IN VARCHAR2,
+    p_direccion IN VARCHAR2,
+    p_telefono IN NUMBER
+);  
+
+PROCEDURE actualizar_cliente(
+    p_id IN NUMBER,
+    p_nombre IN VARCHAR2,
+    p_direccion IN VARCHAR2,
+    p_telefono IN NUMBER
+);
+END;
+
+CREATE OR REPLACE PACKAGE BODY ACCIONES_CLIENTE AS 
+    
+PROCEDURE agregar_cliente(
+    p_id IN NUMBER,
+    p_nombre IN VARCHAR2,
+    p_direccion IN VARCHAR2,
+    p_telefono IN NUMBER)
+AS 
+BEGIN 
+    INSERT INTO clientes VALUES(p_id, p_nombre, p_direccion, p_telefono);
+COMMIT;
+END;
+
+ PROCEDURE actualizar_cliente(
+    p_id IN NUMBER,
+    p_nombre IN VARCHAR2,
+    p_direccion IN VARCHAR2,
+    p_telefono IN NUMBER)
+AS
+    BEGIN
+    
+ UPDATE Clientes
+    SET cliente_nombre = p_nombre,
+        cliente_direccion = p_direccion,
+        cliente_telefono = p_telefono
+    WHERE cliente_id = p_id;
+
+ COMMIT;
+END;
+
+END ACCIONES_CLIENTE;
+
+-- probar ejecucion de paquete para actualizar cliente 
+Begin
+ACCIONES_CLIENTE.actualizar_cliente(1, 'Esteban Gomez', 'Calle 4, Ciudad', 91023475);
+END; 
+select * from clientes; 
+
+-- Paquete Mecanicos
+CREATE OR REPLACE PACKAGE ACCIONES_MECANICO AS
+PROCEDURE buscar_mecanico(
+    p_id IN Mecanicos.mecanico_id%TYPE,
+    p_nombre OUT Mecanicos.mecanico_nombre%TYPE,
+    p_direccion OUT Mecanicos.mecanico_direccion%TYPE,
+    p_telefono OUT Mecanicos.mecanico_telefono%TYPE
+);
+END;
+
+CREATE OR REPLACE PACKAGE BODY ACCIONES_MECANICO AS 
+PROCEDURE buscar_mecanico(
+    p_id IN Mecanicos.mecanico_id%TYPE,
+    p_nombre OUT Mecanicos.mecanico_nombre%TYPE,
+    p_direccion OUT Mecanicos.mecanico_direccion%TYPE,
+    p_telefono OUT Mecanicos.mecanico_telefono%TYPE
+)
+    IS
+BEGIN
+    SELECT mecanico_nombre, mecanico_direccion, mecanico_telefono
+    INTO p_nombre, p_direccion, p_telefono
+    FROM Mecanicos
+    WHERE mecanico_id = p_id;
+    DBMS_OUTPUT.PUT_LINE('Mecánico encontrado: ' || p_nombre || ', dirección: ' || p_direccion || ', teléfono: ' || p_telefono);
+END;
+END ACCIONES_MECANICO;
+
+-- Paquete vehiculos 
+
+CREATE OR REPLACE PACKAGE PAC_VEHICULOS AS
+PROCEDURE mostrar_vehiculos_cliente(
+    p_cliente_id IN Clientes.cliente_id%TYPE
+);
+END;
+
+CREATE OR REPLACE PACKAGE BODY PAC_VEHICULOS AS 
+PROCEDURE mostrar_vehiculos_cliente(
+    p_cliente_id IN Clientes.cliente_id%TYPE
+)
+IS
+BEGIN
+FOR vehiculo IN (
+        SELECT vehiculo_marca, vehiculo_modelo, vehiculo_placa
+        FROM Vehiculos
+        WHERE cliente_id = p_cliente_id
+    ) LOOP
+        DBMS_OUTPUT.PUT_LINE(vehiculo.vehiculo_marca || ' ' || vehiculo.vehiculo_modelo || ', placa ' || vehiculo.vehiculo_placa);
+    END LOOP;
+END;
+END PAC_VEHICULOS;
+
+
+-- Paquete Sucursales
+CREATE OR REPLACE PACKAGE PAC_SUCURSALES AS
+     PROCEDURE listar_sucursales_ordenadas_por_direccion;
+
+END;
+    
+
+CREATE OR REPLACE PACKAGE BODY PAC_SUCURSALES AS 
+    PROCEDURE listar_sucursales_ordenadas_por_direccion
+IS
+BEGIN
+FOR sucursal IN (SELECT * FROM Sucursales ORDER BY sucursal_direccion)
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('ID: ' || sucursal.sucursal_id || ', dirección: ' || sucursal.sucursal_direccion || ', teléfono: ' || sucursal.sucursal_telefono);
+    END LOOP;
+END;
+END PAC_SUCURSALES;
+
+-- Paquete Citas 
+
+CREATE OR REPLACE PACKAGE PAC_CITAS AS
+PROCEDURE mostrar_citas_mecanico(
+    p_mecanico_id IN Citas.mecanico_id%TYPE
+);
+END;
+
+CREATE OR REPLACE PACKAGE BODY PAC_CITAS AS 
+    PROCEDURE mostrar_citas_mecanico(
+    p_mecanico_id IN Citas.mecanico_id%TYPE
+)
+IS
+BEGIN
+FOR cita IN (SELECT cita_descripcion, cita_fecha, cita_hora
+                 FROM Citas
+                 WHERE mecanico_id = p_mecanico_id)
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('Descripción: ' || cita.cita_descripcion || ', fecha: ' || cita.cita_fecha || ', hora: ' || cita.cita_hora);
+    END LOOP;
+END;
+END PAC_CITAS; 
