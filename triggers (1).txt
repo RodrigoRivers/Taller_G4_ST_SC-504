@@ -1,0 +1,48 @@
+CREATE OR REPLACE TRIGGER actualizar_repuestos_cantidad
+AFTER INSERT ON Facturas
+FOR EACH ROW
+BEGIN
+  UPDATE Repuestos SET repuesto_cantidad = repuesto_cantidad - :new.factura_monto WHERE repuesto_id = :new.repuesto_id;
+END;
+
+
+
+CREATE OR REPLACE TRIGGER repuesto_agotado
+BEFORE UPDATE ON Repuestos
+FOR EACH ROW
+BEGIN
+  IF :new.repuesto_cantidad <= 0 THEN
+    DBMS_OUTPUT.PUT_LINE('El repuesto ' || :new.repuesto_descripcion || ' se ha agotado.');
+  END IF;
+END;
+
+
+CREATE OR REPLACE TRIGGER nueva_cita
+AFTER INSERT ON Vehiculos
+FOR EACH ROW
+BEGIN
+    INSERT INTO Citas (cita_id, cliente_id, mecanico_id, sucursal_id, cita_descripcion, cita_fecha, cita_hora)
+    VALUES (NULL, :new.cliente_id, :new.mecanico_id, 1, 'Revisión', SYSDATE, TO_CHAR(SYSDATE, 'HH24:MI'));
+END;
+
+
+CREATE OR REPLACE TRIGGER update_maquina_cantidad
+AFTER DELETE ON Citas
+FOR EACH ROW
+BEGIN
+    UPDATE Maquinas SET maquina_cantidad = maquina_cantidad + 1
+    WHERE maquina_id = :old.cita_id;
+END;
+
+
+CREATE OR REPLACE TRIGGER prevenir_eliminacion_cliente
+BEFORE DELETE ON Clientes
+FOR EACH ROW
+DECLARE
+  vehiculos_cliente NUMBER;
+BEGIN
+  SELECT COUNT(*) INTO vehiculos_cliente FROM Vehiculos WHERE cliente_id = :old.cliente_id;
+  IF vehiculos_cliente > 0 THEN
+    DBMS_OUTPUT.PUT_LINE( 'No se puede eliminar un cliente que tenga vehículos registrados.');
+  END IF;
+END;
